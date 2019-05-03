@@ -42,7 +42,13 @@
                 </div>
             </form>
             <div class="form-group">
-                <div *ngIf="project.web"><button (click)="updateWebStatus()" class="btn btn-lg btn-danger action">Disable public web access</button></div><div *ngIf="!project.web"><button (click)="updateWebStatus()" class="btn btn-lg btn-primary action">Enable public web access</button></div>
+                <div *ngIf="project.web">
+                    <div><button (click)="updateWebStatus()" class="btn btn-lg btn-danger action">Disable public web access</button></div>
+                    <div>Public url: {{swift_url}}/v1/AUTH_{{project.ksProject}}/{{user.uid}}_{{project.name}}</div>
+                </div>
+                <div *ngIf="!project.web">
+                    <button (click)="updateWebStatus()" class="btn btn-lg btn-primary action">Enable public web access</button>
+                </div>
             </div>
             <div class="form-group">
                 <label>Jobs</label>
