@@ -12,6 +12,7 @@ The executors supported by Herodote are:
 
 * Slurm (via Go-Docker)
 * Sge (via Go-Docker)
+* Docker (via Go-Docker)
 * Web hooks: call an external web application ([herodote-cli](https://github.com/osallou/herodote-cli) for example)
 
 Hooks are basically bash scripts matching some files with a regular expression (see FAQ in web page for more info, by default matches all data pushed to /data/*).
@@ -26,7 +27,9 @@ Data access (read-only or read-write) can be shared with other users, even if th
 
 ## Data access
 
-The storage being Openstack Swift, you can use any client compatible or use their API however we recommand to use the python swiftclient tool. Usage is detailled on each project page.
+The storage being Openstack Swift, you can use any client compatible or use their API however we recommand to use the python swiftclient tool or [https://github.com/osallou/herodote-file/releases](herodote-file). Usage is detailled on each project page.
+
+*herodote-file* is a single binary with no dependencies, working on Linux/Mac/Windows
 
 ## Object storage
 
@@ -46,6 +49,20 @@ OIDC has been tested with [Elixir AAI](https://www.elixir-europe.org/services/co
 see herodote/config and copy default.yml.template to default.yml
 
 see herodote/config/custom-environment-variables.yaml to override config by environment variables
+
+Executors script download and upload files using either swift or herodote-file. See configuration to specify which client you want to use for each executor (example: godocker/client => swift | hero)
+
+Specified client must be available in PATH where job is executed, or loaded via the executor load_module parameter (example:  . load_python_swift_env.sh or . load_herodote_tools.sh)
+
+If *swift* is set as client (default), python swift client will be used and curl will be used to notify about job status.
+
+If *hero* is set as client, both hero-file and hero-notify executables must be available in PATH. They can be downloaded at:
+
+ * [https://github.com/osallou/herodote-file/releases](herodote-file): swift like took to download or upload files, single binary with no deps
+ * [https://github.com/osallou/herodote-notify/releases](herodote-notify): tool to notify herodote about job status, single binary with no deps
+
+Be sure to rename them to *hero-file* and *hero-notify* and give execution rights to those files.
+
 
 ## Repository structure
 
