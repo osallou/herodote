@@ -111,7 +111,7 @@ runHook = function(project, bucket, hook, filePath) {
     return new Promise(function(resolve, reject){
         let ts= new Date().getTime();
         let job = {
-            id: bucket+'.'+ts,
+            id: bucket + '.' + hook.name + '.' + ts,
             user: project.owner,
             hook: hook,
             projectId: project._id,
