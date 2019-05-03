@@ -1,0 +1,86 @@
+herodote:
+  admin: "adminUserIdListCommaSeparated"
+  public_href: "http://localhost:3001"
+  privacy_url: ""
+  operator: "My company"
+  support: "support@my.org"
+  executors:
+    - "slurm:genouest:native"
+    - "mesos:default:docker"
+    - "webhook"
+  webhook:
+    executor: "webhooks"
+  "slurm:genouest:native":
+    executor: "godocker"
+  "mesos:default:docker":
+    executor: "godocker"
+  godocker:
+    url: "https://godocker.genouest.org"
+    run_as: 'existing_user_to_exec_jobs'
+    admin_uid: 'admin_user_id'
+    admin_apikey: 'admin_user_api_key'
+    load_module: ". envpython-3.6.3.sh"
+    client: "swift"
+    extra_volumes: ""
+  webhooks:
+    load_module: ""
+
+mongo:
+  port: 27017
+  host: "localhost"
+  db: "herodote"
+
+redis:
+  port: 6379
+  host: "localhost"
+
+ldap:
+  uri: "ldap://127.0.0.1:389"
+  dn: "dc=my,dc=org"
+  admin_user: "cn=admin,dc=my,dc=org"
+  admin_password: "my_ldap_password"
+  tls: false
+
+rabbitmq:
+  url: "amqp://localhost"
+  queue: "herodote"
+
+openstack:
+  swift:
+    url: "https://genostack-api-swift.genouest.org"
+    default_domain: "Users"
+    load_module: ". envpython-3.6.3.sh"
+    tokens: "XXXX"
+    quota: "100GB"
+    externalQuota: "100GB"
+
+  keystone:
+    url: "https://genostack-api-keystone.genouest.org/v3"
+    bind_to: true
+    os_user_id: "a_keystone_user_admin"
+    os_user_password: "a_keystone_user_admin_password"
+    os_user_project: "a_keystone_user_admin_project_name"
+    os_user_domain: "a_keystone_user_admin_domain"
+
+smtp:
+  host: "localhost"
+  port: 1025
+  from: "support@local"
+
+secrets:
+  jwt: "a_secret_for_jwt_token_encryption"
+  swift: "a_secret_shared_with_swift_middleware"
+
+
+oidc:
+  issuer: "https://login.elixir-czech.org/oidc"
+  scope: "openid profile email"
+  client_id: "openid_client_identifier"
+  client_secret: "openid_client_secret"
+  callbackURL: "/auth/aai/callback"
+  response_type: "code"
+  ldap_group_name: "elixir"
+  ldap_group_gid: 500
+  ldap_search_base: "ou=elixir"
+  ldap_uid_start: 100000,
+  ldap_base_home: '/home/elixir'

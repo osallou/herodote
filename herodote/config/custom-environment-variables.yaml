@@ -1,0 +1,69 @@
+herodote:
+  admin: "HERODOTE_ADMIN"
+  public_href: "PUBLIC_HREF"
+  support: "SUPPORT"
+  privacy_url: "PRIVACY"
+  operator: "OPERATOR"
+  godocker:
+    url: "GODOCKER_URL"
+    run_as: "GODOCKER_RUNAS"
+    admin_uid: 'GODOCKER_ADMIN_UID'
+    admin_apikey: 'GODOCKER_ADMIN_APIKEY'
+    load_module: 'GODOCKER_LOAD_MODULE'
+    client: "GODOCKER_CLIENT"
+    extra_volumes: "GODOCKER_EXTRA_VOLUMES"
+
+mongo:
+  port: "MONGO_PORT"
+  host: "MONGO_HOST"
+  db: "MONGO_DB"
+
+redis:
+  port: "REDIS_PORT"
+  host: "REDIS_HOST"
+
+ldap:
+  uri: "LDAP_URI"
+  dn: "LDAP_DN"
+  admin_user: "LDAP_USER"
+  admin_password: "LDAP_PASSWORD"
+  tls: "LDAP_TLS"
+
+rabbitmq:
+  url: "RABBITMQ_URL"
+  queue: "RABBITMQ_QUEUE"
+
+openstack:
+  swift:
+    url: "SWIFT_URL"
+    default_domain: "SWIFT_DEFAULT_DOMAIN"
+    load_module: "SWIFT_LOAD_MODULE"
+    tokens: "SWIFT_TOKENS"
+    quota: "SWIFT_QUOTA"
+    externalQuota: "SWIFT_EQUOTA"
+  keystone:
+    url: "KS_URL"
+    bind_to: "KS_BIND_TO"
+    os_user_id: "KS_USER_ID"
+    os_user_password: "KS_USER_PASSWORD"
+    os_user_project: "KS_USER_PROJECT"
+    os_user_domain: "KS_USER_DOMAIN"
+
+smtp:
+  host: "SMTP_HOST"
+  port: "SMTP_PORT"
+  from: "SMTP_FROM"
+
+secrets:
+  jwt: "SECRETS_JWT"
+  swift: "SECRETS_SWIFT"
+
+oidc:
+  issuer: "OIDC_ISSUER"
+  client_id: "OIDC_CLIENT_ID"
+  client_secret: "OIDC_CLIENT_SECRET"
+  ldap_group_name: "OIDC_LDAP_GROUP_NAME"
+  ldap_group_gid: "OIDC_LDAP_GROUP_GID"
+  ldap_uid_start: "OIDC_LDAP_UID_START"
+  ldap_search_base: "OIDC_LDAP_SEARCH_BASE"
+  ldap_base_home: "OIDC_LDAP_BASE_HOME"

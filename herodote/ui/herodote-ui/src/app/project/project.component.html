@@ -1,0 +1,205 @@
+<div *ngIf="msg" class="alert alert-warning" role="alert">
+    {{msg}}
+</div>
+<div class="card" *ngIf="project">
+    <div class="card-header">
+        <ul class="nav nav-tabs card-header-tabs">
+            <li class="nav-item">
+                <a class="nav-link" [class.active]="isActive('project')" (click)="activatePanel('project')" [routerLink]="">Project</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" [class.active]="isActive('hooks')" [ngClass]="{'alert': project && project.hooks.length == 0, 'alert-warning': project && project.hooks.length == 0}" [class.alert] (click)="activatePanel('hooks')" [routerLink]="">Hooks</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" [class.active]="isActive('acls')" (click)="activatePanel('acls')" [routerLink]="">ACLs</a>
+            </li>
+            <li class="nav-item">
+                    <a class="nav-link"  [routerLink]="['/project', project.name, 'job']">Jobs</a>
+                </li>
+            <li class="nav-item">
+                <a class="nav-link" [class.active]="isActive('howto')" (click)="activatePanel('howto')" [routerLink]="">How-to</a>
+            </li>
+        </ul>        
+    </div>
+    <div class="card-body">
+        <div *ngIf="isActive('project')">
+            <form class="form-group">
+                <div class="form-group">
+                <label for="ksProject">Openstack project</label>
+                    <input [ngModelOptions]="{standalone: true}" [(ngModel)]="project.ksProject" id="ksProject" type="text" class="form-control" placeholder="project name" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="name">Project name</label>
+                    <input [ngModelOptions]="{standalone: true}" [(ngModel)]="project.name" id="name" type="text" class="form-control" placeholder="project name" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="description">Project info</label>
+                    <textarea [ngModelOptions]="{standalone: true}" [(ngModel)]="project.description" id="description" type="text" class="form-control" placeholder="project description"></textarea>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-lg btn-primary action" type="button" (click)="update()">Update</button>
+                    <button class="btn btn-lg btn-danger action" type="button" (click)="delete()">Delete</button>
+                </div>
+            </form>
+            <div class="form-group">
+                <div *ngIf="project.web"><button (click)="updateWebStatus()" class="btn btn-lg btn-danger action">Disable public web access</button></div><div *ngIf="!project.web"><button (click)="updateWebStatus()" class="btn btn-lg btn-primary action">Enable public web access</button></div>
+            </div>
+            <div class="form-group">
+                <label>Jobs</label>
+            </div>
+            <div class="row bs-wizard" style="border-bottom:0;">
+                
+                <div class="col-md-3 bs-wizard-step">
+                  <div class="text-center bs-wizard-stepnum">Pending</div>
+                  <div class="progress"><div class="progress-bar"></div></div>
+                  <div class="bs-wizard-dot"></div>
+                  <div class="bs-wizard-info text-center">{{stats.pending}}</div>
+                </div>
+                
+                <div class="col-md-3 bs-wizard-step">
+                  <div class="text-center bs-wizard-stepnum">Running</div>
+                  <div class="progress"><div class="progress-bar"></div></div>
+                  <div class="bs-wizard-dot"></div>
+                  <div class="bs-wizard-info text-center">{{stats.running}}</div>
+                </div>
+
+                <div class="col-md-3 bs-wizard-step complete">
+                    <div class="text-center bs-wizard-stepnum">Done</div>
+                    <div class="progress"><div class="progress-bar"></div></div>
+                    <div class="bs-wizard-dot"></div>
+                    <div class="bs-wizard-info text-center">{{stats.done}}</div>
+                  </div>
+            </div>
+
+            <form class="form-group">
+                <div class="form-group" *ngIf="meta">
+                    <label for="size">Current size</label>
+                    <input name="size" class="form-control" [ngModel]="meta['x-container-bytes-used'] | formatBytes" (ngModelChange)="meta['x-container-bytes-used']=$event" id="size" type="text" disabled/>
+                </div>
+                <div class="form-group" *ngIf="meta && meta['x-container-meta-quota-bytes']">
+                    <label for="quota">Quota</label>
+                    <input name="quota" class="form-control" [ngModel]="meta['x-container-meta-quota-bytes'] | formatBytes" (ngModelChange)="meta['x-container-bytes-used']=$event" id="quota" type="text" disabled/>
+                </div>
+                <div class="form-group" *ngIf="meta">
+                    <label for="lastm">Last modified</label>
+                    <input class="form-control" disabled  [ngModelOptions]="{standalone: true}" [(ngModel)]="meta['last-modified']" id="lastm">
+                </div>
+                <div class="form-group">
+                        <label for="ksProjectId">Project id</label>
+                        <input name="ksProjectId" class="form-control" [ngModel]="project.ksProject" id="ksProjectId" type="text" disabled/>
+                    </div> 
+            </form>
+        </div>
+        <div *ngIf="isActive('hooks') && project && project.hooks.length > 0">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <a [routerLink]="['/project', project.name ,'hook']"><button class="btn btn-primary">CREATE</button></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4" *ngFor="let hook of project.hooks">
+                    <div class="card">
+                        <div class="card-header"><a [routerLink]="['/project', project.name, 'hook', hook.name]">{{hook.name}}</a></div>
+                        <div class="card-body">
+                            <div>{{hook.description}}</div>
+                            <div><button class="btn btn-danger" (click)="deleteHook(hook)">Delete</button></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>    
+        <div *ngIf="isActive('hooks') && project && project.hooks.length == 0">
+            <div class="alert alert-warning">There is no hook defined for this project</div>
+            <p>Hooks lets you trigger a script on each new or modified data pushed to this project</p>
+            <p>For the moment, no hook is defined, so no job will be triggered on data push</p>
+            <a [routerLink]="['/project', project.name ,'hook']"><button class="btn btn-primary">CREATE</button></a>
+        </div>
+        <div *ngIf="isActive('acls')">
+            <form *ngIf="selectedAcl">
+                <div class="form-group">
+                    <label for="selectedAcl">{{selectedAcl.name}} token</label>
+                    <textarea rows="4" id="selectedAcl" type="text" class="form-control" placeholder="user token" disabled>{{selectedAcl.token}}</textarea>
+                </div>
+            </form>        
+            <form class="form-group">
+                <div class="form-group">
+                    <label for="newAcl">Add user (username:[ro,rw], username:[ro,rw]:prefix)</label>
+                    <label>ro: read-only, rw: read-write</label>
+                    <input [ngModelOptions]="{standalone: true}" [(ngModel)]="newAcl" id="newAcl" type="text" class="form-control" placeholder="user and read/write access: friend:rw, foe:ro:data/public">
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-lg btn-info" type="button" (click)="addAcl()">Add</button>
+                </div>
+            </form>
+            <div *ngIf="project">
+                <span class="badge badge-info acl">You <button class="btn" (click)="showOwnerAcl()"><i class="oi oi-eye"></i></button></span>
+                <span class="badge badge-info acl" *ngFor="let acl of project.acls">{{acl.name}}:{{acl.ro? 'ro': 'rw'}} <button class="btn" (click)="showAcl(acl)"><i class="oi oi-eye"></i></button>  <button class="btn" (click)="banAcl(acl)"><i class="oi oi-ban"></i></button></span>
+            </div>
+        </div>
+        <div *ngIf="isActive('howto')">
+            <div class="row">
+                <div class="col-sm-12">
+                  <div class="card">
+                    <div class="card-header">Setup</div>
+                    <div class="card-body">
+                      <code>pip install python-swiftclient python-keystoneclient</code>
+                    </div>
+                  </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                  <div class="card">
+                    <div class="card-header">List</div>
+                    <div class="card-body">
+                      <code>export TOKEN=your_token_id</code>
+                      <br/>
+                      <code>swift --os-auth-token "$TOKEN" --os-storage-url {{swift_url}}/v1/AUTH_{{project.ksProject}}  list {{user.uid}}_{{project.name}}</code>
+                    </div>
+                  </div>
+                </div>    
+                <div class="col-sm-12">
+                  <div class="card">
+                    <div class="card-header">Upload</div>
+                    <div class="card-body">
+                        <code>export TOKEN=your_token_id</code>
+                        <p>To push some data to this project, upload them to the data directory:</p>
+                        <p>If file > 1G</p>
+                        <code>swift --os-auth-token "$TOKEN" --os-storage-url {{swift_url}}/v1/AUTH_{{project.ksProject}} upload {{user.uid}}_{{project.name}} -S 1073741824 large_file_to_upload --object-name data/large_file_to_upload</code>
+                        <p>else</p>
+                        <code>swift --os-auth-token "$TOKEN" --os-storage-url {{swift_url}}/v1/AUTH_{{project.ksProject}} upload {{user.uid}}_{{project.name}} file_to_upload --object-name data/file_to_upload</code>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-12">
+                  <div class="card">
+                    <div class="card-header">Download</div>
+                    <div class="card-body">
+                        <code>export TOKEN=your_token_id</code>
+                        <br/>
+                        <code>swift --os-auth-token "$TOKEN" --os-storage-url {{swift_url}}/v1/AUTH_{{project.ksProject}} download {{user.uid}}_{{project.name}} file_to_download</code>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-12">
+                        <div class="card">
+                          <div class="card-header">Delete</div>
+                          <div class="card-body">
+                              <code>export TOKEN=your_token_id</code>
+                              <br/>
+                              <code>swift --os-auth-token "$TOKEN" --os-storage-url {{swift_url}}/v1/AUTH_{{project.ksProject}} delete {{user.uid}}_{{project.name}} file_to_delete</code>
+                              <p>To delete all files</p>
+                              <code>swift  --os-auth-token "$TOKEN" --os-storage-url {{swift_url}}/v1/AUTH_{{project.ksProject}} list {{user.uid}}_{{project.name}} > list.lst</code>
+                              <br/>
+                              <code>cat list.lst | xargs swift --os-auth-token "$TOKEN" --os-storage-url {{swift_url}}/v1/AUTH_{{project.ksProject}} delete {{user.uid}}_{{project.name}} {{ '{' }}{{ '}' }}</code>
+                          </div>
+                        </div>
+                      </div>  
+            </div>
+        </div>
+
+    </div>
+</div>
+

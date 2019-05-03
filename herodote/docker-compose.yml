@@ -1,0 +1,98 @@
+version: '3'
+
+services:
+  mongo:
+    image: mongo
+    volumes:
+      - ${DATADIR}/mongo:/data/db
+
+  redis:
+    image: redis
+    volumes:
+      - ${DATADIR}/redis:/data/db
+
+  rabbitmq:
+    image: rabbitmq
+    hostname: herodote-rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=herodote
+      - RABBITMQ_DEFAULT_PASS=herodote
+
+
+  herodote-web:
+    image: osallou/herodote
+    build:
+      context: .
+    depends_on:
+      - mongo
+      - rabbitmq
+    # 
+    #volumes:
+    #  - path_to_ldap_base_home:/path_to_ldap_base_home
+    ports:
+      - "3000:3000"
+    environment:
+      - FAKE_AUTH=1
+      - HERODOTE_ADMIN=${HERODOTE_ADMIN}
+      - OPERATOR=${OPERATOR}
+      - PUBLIC_HREF=${PUBLIC_HREF}
+      - SUPPORT=${SUPPORT}
+      - MONGO_HOST=mongo
+      - REDIS_HOST=redis
+      - LDAP_URI=${LDAP_URI}
+      - LDAP_DN=${LDAP_DN}
+      - LDAP_USER=${LDAP_USER}
+      - LDAP_PASSWORD=${LDAP_PASSWORD}
+      - RABBITMQ_URL=amqp://herodote:herodote@rabbitmq:5672/%2F
+      - SECRETS_JWT=${SECRETS_JWT}
+      - SECRETS_SWIFT=${SECRETS_SWIFT}
+      - SWIFT_URL=${SWIFT_URL}
+      - SWIFT_DEFAULT_DOMAIN=${SWIFT_DEFAULT_DOMAIN}
+      - SWIFT_TOKENS=${SWIFT_TOKENS}
+      - KS_URL=${KS_URL}
+      - KS_BIND_TO=${KS_BIND_TO}
+      - KS_USER_ID=${KS_USER_ID}
+      - KS_USER_PASSWORD=${KS_USER_PASSWORD}
+      - KS_USER_PROJECT=${KS_USER_PROJECT}
+      - KS_USER_DOMAIN=${KS_USER_DOMAIN}
+      - OIDC_ISSUER=${OIDC_ISSUER}
+      - OIDC_CLIENT_ID=${OIDC_CLIENT_ID}
+      - OIDC_CLIENT_SECRET=${OIDC_CLIENT_SECRET}
+      - OIDC_LDAP_GROUP_NAME=${OIDC_LDAP_GROUP_NAME}
+      - OIDC_LDAP_GROUP_GID=${OIDC_LDAP_GROUP_GID}
+      - OIDC_LDAP_UID_START=${OIDC_LDAP_UID_START}
+      - OIDC_LDAP_SEARCH_BASE=${OIDC_LDAP_SEARCH_BASE}
+      - OIDC_LDAP_BASE_HOME=${OIDC_LDAP_BASE_HOME}
+    command: node bin/herodote-server
+
+
+  herodote-jobs:
+    image: osallou/herodote
+    build:
+      context: .
+    depends_on:
+      - mongo
+      - rabbitmq
+    environment:
+      - PUBLIC_HREF=${PUBLIC_HREF}
+      - MONGO_HOST=mongo
+      - GODOCKER_URL=${GODOCKER_URL}
+      - GODOCKER_RUNAS=${GODOCKER_RUNAS}
+      - GODOCKER_ADMIN_UID=${GODOCKER_ADMIN_UID}
+      - GODOCKER_ADMIN_APIKEY=${GODOCKER_ADMIN_APIKEY}
+      - GODOCKER_CLIENT=${GODOCKER_CLIENT}
+      - GODOCKER_EXTRA_VOLUMES=${GODOCKER_EXTRA_VOLUMES}
+      - GODOCKER_LOAD_MODULE=${GODOCKER_LOAD_MODULE}
+      - RABBITMQ_URL=amqp://herodote:herodote@rabbitmq:5672/%2F
+      - SECRETS_JWT=${SECRETS_JWT}
+      - SECRETS_SWIFT=${SECRETS_SWIFT}
+      - SWIFT_URL=${SWIFT_URL}
+      - SWIFT_DEFAULT_DOMAIN=${SWIFT_DEFAULT_DOMAIN}
+      - SWIFT_TOKENS=${SWIFT_TOKENS}
+      - KS_URL=${KS_URL}
+      - KS_BIND_TO=${KS_BIND_TO}
+      - KS_USER_ID=${KS_USER_ID}
+      - KS_USER_PASSWORD=${KS_USER_PASSWORD}
+      - KS_USER_PROJECT=${KS_USER_PROJECT}
+      - KS_USER_DOMAIN=${KS_USER_DOMAIN}     
+    command: node jobReceiver.js

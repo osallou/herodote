@@ -1,0 +1,30 @@
+{
+  "name": "@osallou/my-herodote",
+  "version": "0.1.1",
+  "description": "user cli tool to manage Herodote projects",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "my-hero": "./bin/my-herodote.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/osallou/herodote.git"
+  },
+  "keywords": [
+    "herodote"
+  ],
+  "author": "Olivier Sallou",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/osallou/herodote/issues"
+  },
+  "homepage": "https://github.com/osallou/herodote#readme",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "commander": "^2.19.0",
+    "promise": "^8.0.2"
+  }
+}

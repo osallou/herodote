@@ -1,0 +1,26 @@
+<div *ngIf="msg" class="alert alert-warning" role="alert">
+    {{msg}}
+</div>
+<div class="card">
+    <div class="card-header">Create a project</div>
+    <div class="card-body">
+        <form class="form-group">
+            <div class="form-group">
+                <select [ngModelOptions]="{standalone: true}" [(ngModel)]="project.ksProject" id="ksProject" type="text" class="form-control" placeholder="project name (alphanumeric only)" required>
+                  <option *ngFor="let p of projects" [value]="p.id">
+                    {{p.name}}
+                  </option>
+                </select>
+            </div>
+            <div class="form-group">
+                <input [ngModelOptions]="{standalone: true}" [(ngModel)]="project.name" id="name" type="text" class="form-control" placeholder="project name" required autofocus>
+            </div>
+            <div class="form-group">
+                <textarea [ngModelOptions]="{standalone: true}" [(ngModel)]="project.description" id="description" type="text" class="form-control" placeholder="project description"></textarea>
+            </div>
+            <div class="form-group">
+                <button class="btn btn-lg btn-primary btn-block" type="button" (click)="create()">Create</button>
+            </div>
+        </form>
+    </div>
+</div>

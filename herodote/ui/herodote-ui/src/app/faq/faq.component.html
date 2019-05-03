@@ -1,0 +1,159 @@
+<div class="card">
+  <div class="card-header text-white bg-info mb-3" (click)="setCollapsed('about')">About</div>
+  <div class="card-body" [ngbCollapse]="isCollapsed('about')">
+    <p>Herodote is a "data to compute" serverless software. When you push data (new file or update a file) to the Openstack object storage in a project (bucket), Herodote checks for hooks.
+    If a hook is defined for this data, then a job is automatically submitted. The hook will download the file, execute the commands you defined and upload the results back to the storage server.
+    For more info, look at Projects and Hooks sections.</p>
+    <p>All is about automation, users focus on data, not on jobs.</p>
+    <p>So the first step is to create a project...</p>
+  </div>
+</div>
+<div class="card">
+    <div class="card-header text-white bg-info mb-3" (click)="setCollapsed('projects')">Projects</div>
+    <div class="card-body" [ngbCollapse]="isCollapsed('projects')">
+      <p>The project is the entry-point of Herodote. When you create a project, a new bucket is created in the storage server.
+      Once bucket is created, you can push or download files from the server using the Openstack swift client or Herodote-file (https://github.com/osallou/herodote-file).
+      Instructions on setup and how to download/upload files are given in project page.</p>
+      <p>However, while no hook is defined, no job is triggered on data modification. Project is only a storage area automatically created for you.</p>
+      <p>Of course, you can access your data, but you can also share access with other users, they even do not need to have an account.</p>
+      <p>For more info on data access rights, see the ACLs section.</p>
+      <br/>
+      <p>Once a project is created, you should create a hook (or several ones)</p>
+      <br/>
+      <p>To delete a project, you <strong>must</strong> empty the data before.</p>
+    </div>
+</div>
+<div class="card">
+    <div class="card-header text-white bg-info mb-3" (click)="setCollapsed('hooks')">Hooks</div>
+    <div class="card-body" [ngbCollapse]="isCollapsed('hooks')">
+      <p>When a file is modified (or created), Herodote is triggered by storage server. Hooks, related to a project, define if a job should be triggered for this file.</p>
+      <p>For this, hooks define a regexp (regular expression) that will match (or not) the file path</p>
+      <p>It there is a match, the script defined in the hook will be executed on a executor (slurm , etc. see executors section for more info)</p>
+      <p>The recommended data structure is to push your data in a <i>data</i> subdirectory and to use a regexp matching <i>data/.*</i> and to push your result files to <i>result/</i> subdirectory</p>
+      <p>Result directory will contain a compressed archive with your results and a log file.</p>
+      <br/>
+      <p>Hook triggers works on a single file basis, you cannot push related files and execute a script against all those files. Herodote is triggered on a per file basis. If you need to execute a job based on multiple files:</p>
+        <ul>
+          <li>Create an archive with all needed files and push it</li>
+          <li>If you need additional files (persistent and already loaded, push your data to an other subdirectory (/basedata for example) and in the hook script, download those additional files using the $SWIFTDOWNLOAD macro</li>
+        </ul>
+      <p>A hook will globally defined:</p>
+      <ul>
+        <li>A bash script to execute (with a provided template)</li>
+        <li>The cpu and memory requirements to run the job</li>
+        <li>An executor (where to run the job)</li>
+        <li>Some metadata</li>
+      </ul>
+      <p><strong>Warning</strong>: a hook specifies some cpu and memory requirements. Before defining a hook, please make sure the remote system can support those requirements (requiring too much cpus or memory).
+      If job is rejected by the executor, you will get no progress/rejection information in the jobs panel.
+      </p>
+    </div>
+</div>
+<div class="card">
+    <div class="card-header text-white bg-info mb-3" (click)="setCollapsed('acls')">ACLs</div>
+    <div class="card-body" [ngbCollapse]="isCollapsed('acls')">
+      <p>ACLs lets you define who can access to your data. You can add external users with read-only (ro) or read-write(rw) access to your project data.</p>
+      <p>Each user will have a personal token that should be used to access the data with the swift client</p>
+      <p>To remove access to a user, simply remove it from the ACLs list for your project.</p>
+      <p>You also have a permanent specific token to access your data (read-write). You can get it in the ACLs panel of your project</p>
+      <p>ACLs are defined by:</p>
+        <ul>
+          <li>aclname:ro|rw  give read only or read write access to a whole project</li>
+          <li>aclname:ro|rw:prefix  give read only or read write access to a project, limiting access to path prefixed with <i>prefix</i></li>
+        </ul>
+      <p>For example, someone:ro:data/public will generate an access key to any file under data/public in read only mode</p>
+      <p>A token is linked to a specific project.</p>
+      <br/>
+      <p>If you have an openstack account, you can use your openstack environement file with the swift client, you do not need to use the token to upload or download data.</p>
+      <code>. my_openstack_env_file.sh</code>
+      <br/>
+      <code>swift download myUserID_myProjectName  file_to_download</code>
+    </div>
+</div>
+<div class="card">
+    <div class="card-header text-white bg-info mb-3" (click)="setCollapsed('jobs')">Jobs</div>
+    <div class="card-body" [ngbCollapse]="isCollapsed('jobs')">
+      <p>Once a hook detected that a job should be run, Herodote will trigger a new job on the executor.</p>
+      <p>Though a job is sbumitted, it may take a longer time to start, the remote system may schedule it at a later time if resources are not available immediatly.</p>
+      <p>The jobs section of the project shows the list of jobs (submitted, running or over) for the selected project, their status should be updated if you kept the <i>$SENDHERODOTEPROGRESS</i> macros in the hook script</p>
+      <p>If you have an account on the executor system, you can login to the executor to get more info/progress on your job.</p>
+      <br/>
+      <p>In case of problem with a job (not starting, no termination status), please contact the support</p>
+    </div>
+</div>
+<div class="card">
+    <div class="card-header text-white bg-info mb-3" (click)="setCollapsed('executors')">Executors</div>
+    <div class="card-body" [ngbCollapse]="isCollapsed('executors')">
+      <p>Herodote supports multiple execution systems (will vary on configuration).</p>
+      <p>Hooks define on which executor the job should be executed</p>
+      <p>Supported executors are:</p>
+      <ul>
+        <li><a href="https://bitbucket.org/osallou/go-docker">Go-Docker</a></li>
+        <li>Web hooks: trigger an external URL</li>
+      </ul>
+      <p>For the moment, only the slurm execution on Go-Docker is supported. In the future we expect to add native slurm job submission as well as Go-Docker container based submission</p>
+      <p>Extra parameters:</p>
+      <p>* Web hooks</p>
+      <p>url and secret extra parameters are mandatory (url=XXX, secret=YYY). url is the URL to trigger and secret is a shared secret to encode a JWT token for authorization (in Authorization header,  Authorization: bearer XXX).</p>
+      <p>Herodote sends a POST request with job information in the body encoded in JSON format:</p>
+      <div ng-non-bindable>
+          {{"{"}}
+            cmd: script_to_execute,
+            file: triggered_file_path,
+            hook: hook_name
+            {{"}"}}
+        </div>
+
+
+    </div>
+</div>
+<div class="card">
+    <div class="card-header text-white bg-info mb-3" (click)="setCollapsed('support')">Support</div>
+    <div class="card-body" [ngbCollapse]="isCollapsed('support')">
+      Still need some help ? Please contact the support at {{support}}
+    </div>
+</div>
+<div class="card">
+    <div class="card-header text-white bg-info mb-3">Privacy policy</div>
+    <div class="card-body">   
+      <p>Last updated: 2019-01-15</p>
+      <p>{{operator}} ("us", "we", or "our") operates https://herodote.genouest.org/ui (the "Site"). This page informs you of our policies regarding the collection, use and disclosure of Personal Information we receive from users of the Site.</p>
+      <p>We use your Personal Information only for providing and improving the Site. By using the Site, you agree to the collection and use of information in accordance with this policy.</p>
+      <p><strong>Information Collection And Use</strong></p>
+      
+      <p>While using our Site, we may ask you to provide us with certain personally identifiable information that can be used to contact or identify you. Personally identifiable information may include, but is not limited to your name ("Personal Information").</p>
+      
+      <p><strong>Log Data</strong></p>
+
+      
+      <p>Like many site operators, we collect information that your browser sends whenever you visit our Site ("Log Data").</p>
+      
+      <p>This Log Data may include information such as your computer's Internet Protocol ("IP") address, browser type, browser version, the pages of our Site that you visit, the time and date of your visit, the time spent on those pages and other statistics.</p>
+      
+      <p><strong>Communications</strong></p>
+      
+      <p>We may use your Personal Information to contact you in case of possible abuse of the service or issues found with your account.</p>
+      
+      <p><strong>Cookies</strong></p>
+      
+      <p>Cookies are files with small amount of data, which may include an anonymous unique identifier. Cookies are sent to your browser from a web site and stored on your computer's hard drive.</p>
+      
+      <p>We use cookies only to create a session when you log in, no personal information or usage is recorded.</p>
+      
+      <p><strong>Security</strong></p>
+      
+      <p>The security of your Personal Information is important to us, but remember that no method of transmission over the Internet, or method of electronic storage, is 100% secure. While we strive to use acceptable means to protect your Personal Information, we cannot guarantee its absolute security.</p>
+      
+      <p><strong>Changes To This Privacy Policy</strong></p>
+      
+      <p>This Privacy Policy is effective as of 2019-01-15 and will remain in effect except with respect to any changes in its provisions in the future, which will be in effect immediately after being posted on this page.</p>
+      
+      <p>We reserve the right to update or change our Privacy Policy at any time and you should check this Privacy Policy periodically. Your continued use of the Service after we post any modifications to the Privacy Policy on this page will constitute your acknowledgment of the modifications and your consent to abide and be bound by the modified Privacy Policy.</p>
+      
+      <p>If we make any material changes to this Privacy Policy, we will notify you either through the email address you have provided us, or by placing a prominent notice on our website.</p>
+      
+      <p><strong>Contact Us</strong></p>
+      
+      <p>If you have any questions about this Privacy Policy, please contact us {{support}}.</p>
+    </div>
+</div>

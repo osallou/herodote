@@ -1,0 +1,65 @@
+<div *ngIf="msg" class="alert alert-warning" role="alert">
+    {{msg}}
+</div>
+<div class="card">
+    <div class="card-header">
+      Hook {{hookId}}
+    </div>
+    <div class="card-body">
+            <form class="form-group">
+                <div class="form-group">
+                <label for="name">Name</label>
+                    <input [ngModelOptions]="{standalone: true}" [(ngModel)]="hook.name" id="name" type="text" class="form-control" placeholder="hook name (alphanumeric only)">
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <input [ngModelOptions]="{standalone: true}" [(ngModel)]="hook.description" id="description" type="text" class="form-control" placeholder="hook description">
+                </div>
+                <div class="form-group">
+                    <label for="executor">Executor</label>
+                    <select [ngModelOptions]="{standalone: true}" [(ngModel)]="hook.executor" id="executor" type="text" class="form-control">
+                      <option *ngFor="let exec of executors" [value]="exec">{{exec}}</option>
+                    </select>
+                </div> 
+                <div class="form-group">
+                        <label for="extra">Extra executor parameter (see executor documentation in FAQ)</label>
+                        <input [ngModelOptions]="{standalone: true}" [(ngModel)]="extra" id="extra" type="text" class="form-control" placeholder="extra parameter key=value">
+                        <button class="btn btn-primary" (click)="addExtra()">Add</button>
+                    </div>
+                    <div class="form-group">
+                        <span *ngFor="let hextra of hook.extra"  class="badge badge-info">{{hextra}} <i class="oi oi-delete" (click)="deleteExtra(hextra)"> </i></span>
+                    </div>                                
+                <div class="form-group">
+                    <label for="description">Regexp (file match to trigger hook)</label>
+                    <input [ngModelOptions]="{standalone: true}" [(ngModel)]="hook.regexp" id="description" type="text" class="form-control" placeholder="regexp">
+                    <p><small>By default, files upload under /data will trigger the job</small></p>
+                </div>
+                <div class="form-group">
+                    <label for="cpu">CPU requirements</label>
+                    <input [ngModelOptions]="{standalone: true}" [(ngModel)]="hook.cpu" id="cpu" type="number" class="form-control" placeholder="number of CPUs">
+                </div>
+                <div class="form-group">
+                    <label for="mem">Mem requirements (In Gb)</label>
+                    <input [ngModelOptions]="{standalone: true}" [(ngModel)]="hook.mem" id="mem" type="number" class="form-control" placeholder="quantity of memory (in Gb)">
+                </div>                              
+                <div class="form-group">
+                    <label for="script">Script</label>
+                    <ngx-codemirror [ngModelOptions]="{standalone: true}" [(ngModel)]="hook.script" [config]="mirrorConfig"></ngx-codemirror>
+                    <br/>
+                    <div class="row">
+                      <div class="col-sm-12 alert alert-info">
+                        <p><small><i>$SENDHERODOTEPROGRESS</i> is a function to update job progress in Herotode, it is optional but will let you check the job status</small></p>
+                        <p><small>Input file ($FILE) will be downloaded with the same directory structure (/data/dir1/file1 will be saved locally under /data/dir1/file1)</small></p>
+                        <p><small>Result files should be saved under result directory, compressed and result archive uploaded by with the SWIFTUPLOAD call.</small></p>
+                      </div>
+                    </div>
+                </div>
+                <div class="form-group" *ngIf="createProject">
+                    <button class="btn btn-lg btn-primary action" type="button" (click)="create()">Create</button>
+                </div>
+                <div class="form-group" *ngIf="!createProject">
+                    <button class="btn btn-lg btn-primary action" type="button" (click)="update()">Update</button>
+                </div>
+            </form>
+    </div>
+</div>

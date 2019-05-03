@@ -1,0 +1,25 @@
+<div class="card" *ngIf="project">
+  <div class="card-header"><a [routerLink]="['/project', project.name]"><i class="oi oi-chevron-left"></i></a> Jobs for project {{project.name}} [0: submitted, 1: running, 2: success, 3: error, 4: killed]</div>
+  <div class="card-body">
+    <table class="table table-striped">
+      <thead class="thead-dark"><tr><th>ID</th><th>File</th><th>Date</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr *ngFor="let j of jobs">
+          <td>{{j.id}}</td>
+          <td>{{j.file}}</td>
+          <td>{{dateConvert(j.start)}}/{{dateConvert(j.begin)}}/{{dateConvert(j.end)}}</td>
+          <td [ngClass]="status(j.status)">{{j.status}}</td>
+        </tr>
+      </tbody>
+      <tfoot>
+          <nav aria-label="Page navigation">
+              <ul class="pagination">
+                <li *ngIf="page>0" class="page-item"><div class="page-link" (click)="prevPage()">Previous</div></li>
+                <li><div class="page-link">{{page * 30}} - {{maxPage()}}</div></li>
+                <li class="page-item"><div class="page-link" (click)="nextPage()">Next</div></li>
+              </ul>
+            </nav>
+      </tfoot>
+    </table>
+  </div>
+</div>
