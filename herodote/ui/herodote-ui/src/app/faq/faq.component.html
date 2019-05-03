@@ -91,8 +91,14 @@
         <li><a href="https://bitbucket.org/osallou/go-docker">Go-Docker</a></li>
         <li>Web hooks: trigger an external URL</li>
       </ul>
-      <p>For the moment, only the slurm execution on Go-Docker is supported. In the future we expect to add native slurm job submission as well as Go-Docker container based submission</p>
+      <p>For the moment, only the slurm and Docker execution via Go-Docker is supported. In the future we expect to add native slurm job submission as well as Go-Docker container based submission</p>
       <p>Extra parameters:</p>
+      <p>* Slurm</p>
+      <p>No extra parameter</p>
+      <p>* Docker</p>
+      <p>image (mandatory: name of Docker image), volumes (optional: comma separated list of volume names as defined in go-docker) and project (optional: if not specified uses default project). Example: project=default, image=centos, volumes=db,home</p>
+      <p>Container can be ran as root with extra parameter <i>root=true</i>, else container is ran with user unix rights</p>
+      <p>Volumes are mounted in read-only mode</p>
       <p>* Web hooks</p>
       <p>url and secret extra parameters are mandatory (url=XXX, secret=YYY). url is the URL to trigger and secret is a shared secret to encode a JWT token for authorization (in Authorization header,  Authorization: bearer XXX).</p>
       <p>Herodote sends a POST request with job information in the body encoded in JSON format:</p>

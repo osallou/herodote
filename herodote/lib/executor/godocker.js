@@ -47,7 +47,8 @@ jobTemplate = function(job) {
         container: {
             image: "debian",
             volumes: [],
-            ports: []
+            ports: [],
+            root: false
         }
     }
 }
@@ -107,6 +108,8 @@ module.exports = {
                           volumes.push({'acl': 'ro', 'name': volume})
                           loaded_volumes.push(volume)
                       }
+                  } else if(extra === 'root=true'){
+                      tmpl.container.root=true
                   }
               }
 
