@@ -118,7 +118,9 @@ export class AuthInterceptor implements HttpInterceptor {
         }, error => {
           if(error.status == 401) {
             this.auth.logout();
-            this.router.navigate(['/login']);
+            if(this.router.url !== '/faq') {
+              this.router.navigate(['/login']);
+            }
           }
         })
       );

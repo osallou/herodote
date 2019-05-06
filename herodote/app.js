@@ -207,6 +207,17 @@ app.use('/projects', projectsRouter);
 app.use('/jobs', jobsRouter);
 app.use('/stats', statsRouter);
 
+// Default route if no match (for spa handling)
+app.get('*', function (request, response) {
+  if(process.env.NODE_ENV === 'development') {
+    response.sendFile(path.resolve(__dirname, 'ui/herodote-ui/src/index.html'));
+  }
+  else {
+    response.sendFile(path.resolve(__dirname, 'ui/herodote-ui/dist/herodote-ui/index.html'));
+  }
+});
+
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
