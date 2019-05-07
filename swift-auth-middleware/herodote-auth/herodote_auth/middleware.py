@@ -27,22 +27,33 @@ class Authorization(object):
             environ['REMOTE_USER'] = '.wsgi.herodote'
 
         def herodote_response(stat_str, headers=[]):
-            resp = start_response(stat_str, headers)
+            calling = ''
+            if creds and creds.get('user', None):
+                calling = creds['user']
+            jobids = []
             try:
                 r = requests.post(
                     self.conf.get('herodote_url') + environ['PATH_INFO'].replace('v1', 'jobs/swift'),
                     json={
                     },
                     headers={
-                        'X-SWIFT-TOKEN': str(self.conf.get('token'))
+                        'X-SWIFT-TOKEN': str(self.conf.get('token')),
+                        'X-HERO-USER': str(calling)
                     }
                 )
                 if r.status_code != 200:
                     logging.error('herodote authorization failed')
                     return start_response('403 Unauthorized', [])
+                r_json = r.json()
+                jobs = r_json['run']['jobs']
+                for job in jobs:
+                    jobids.append(job['job'])
             except Exception:
                 logging.exception('failed to contact herodote')
                 return start_response('500 Error', [])
+            if jobids:
+                headers.append(('X-HERO-JOBS', ','.join(jobids)))
+            resp = start_response(stat_str, headers)
             return resp
         obj = None
         try:

@@ -1,2 +1,3 @@
 .pyc
-
+.eggs
+herodote_auth.egg-info
