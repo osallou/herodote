@@ -1,5 +1,6 @@
 var CONFIG = require('config');
 var monk = require('monk');
+var path = require('path');
 var db = monk(CONFIG.mongo.host + ':' + parseInt(CONFIG.mongo.port) + '/' + CONFIG.mongo.db);
 var jobs_db = db.get('jobs');
 var projects_db = db.get('projects');
@@ -104,7 +105,7 @@ function createJob(content) {
             if (loadSwiftClient != ''){
                 loadSwiftClient = loadSwiftClient + ' || echo "cannot load swift client, trying anyway"';
             }
-
+            let filename = path.basename(job.file);
             let script = job.hook.script;
             let client = 'swift'
             if(CONFIG.herodote[hookExecutor]) {
@@ -116,6 +117,7 @@ function createJob(content) {
                 if(client == 'swift') {
                     script = script.replace(/\$JOBNAME/g, jobName)
                     .replace(/\$HERODOTETOKEN/g, ksToken)
+                    .replace(/\$FILENAME/g, filename)
                     .replace(/\$FILE/g, job.file)
                     .replace(/\$SWIFTUPLOAD/g, swiftUpload)
                     .replace(/\$SWIFTDOWNLOAD/g, swiftDownload)
@@ -124,6 +126,7 @@ function createJob(content) {
                 else if(client == 'hero') {
                     script = script.replace(/\$JOBNAME/g, jobName)
                     .replace(/\$HERODOTETOKEN/g, ksToken)
+                    .replace(/\$FILENAME/g, filename)
                     .replace(/\$FILE/g, job.file)
                     .replace(/\$SWIFTUPLOAD/g, heroUpload)
                     .replace(/\$SWIFTDOWNLOAD/g, heroDownload)
@@ -132,6 +135,7 @@ function createJob(content) {
             } else {
                 script = script.replace(/\$JOBNAME/g, jobName)
                 .replace(/\$HERODOTETOKEN/g, ksToken)
+                .replace(/\$FILENAME/g, filename)
                 .replace(/\$FILE/g, job.file)
                 .replace(/\$SWIFTUPLOAD/g, swiftUpload)
                 .replace(/\$SWIFTDOWNLOAD/g, swiftDownload)

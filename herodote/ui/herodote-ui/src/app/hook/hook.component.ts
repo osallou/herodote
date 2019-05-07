@@ -51,7 +51,7 @@ set -e
 
 # In case of error, trap error, send progress and clean directory
 finish() {
-  $SWIFTUPLOAD $JOBDIR/$JOBNAME.log --object-name result/$JOBNAME/$JOBNAME.log
+  $SWIFTUPLOAD $JOBDIR/$JOBNAME.log --object-name result/$FILE/$JOBNAME/$JOBNAME.log
   $SENDHERODOTEPROGRESS 3
   rm -rf $WORKDIR/$JOBNAME
 }
@@ -71,9 +71,10 @@ export JOBDIR=$WORKDIR/$JOBNAME
 mkdir $JOBDIR
 cd $JOBDIR
 mkdir -p data result script
-$SWIFTDOWNLOAD $FILE
+# Download file x/y/z to data/z
+$SWIFTDOWNLOAD $FILE --object-name data/$FILENAME
 # Uncompress if needed
-#tar xvfz $FILE -C $JOBDIR/data
+#tar xvfz data/$FILENAME -C $JOBDIR/data
 {
 
 #####################
@@ -83,15 +84,16 @@ $SWIFTDOWNLOAD $FILE
 } >$JOBDIR/$JOBNAME.log 2>&1
 # mv results to ../result
 
-$SWIFTUPLOAD $JOBDIR/$JOBNAME.log --object-name result/$JOBNAME/$JOBNAME.log
+$SWIFTUPLOAD $JOBDIR/$JOBNAME.log --object-name result/$FILE/$JOBNAME/$JOBNAME.log
 if find $JOBDIR/result -mindepth 1 | read; then
     echo "push results"
     cd $JOBDIR/result
     tar cfvz $JOBNAME.tar.gz *
     cd $JOBDIR
-    $SWIFTUPLOAD result/$JOBNAME.tar.gz --object-name result/$JOBNAME/$JOBNAME.tar.gz
+    $SWIFTUPLOAD result/$JOBNAME.tar.gz --object-name result/$FILE/$JOBNAME/$JOBNAME.tar.gz
 fi
 $SENDHERODOTEPROGRESS 2
+cd $WORKDIR
 rm -rf $WORKDIR/$JOBNAME
 `;
     this.route.params.subscribe(params => {
@@ -156,8 +158,12 @@ rm -rf $WORKDIR/$JOBNAME
       return;
     }
     if(!this.hook.name.match(/^[a-zA-Z0-9_]+$/)) {
-      this.msg ="name must be alphanumeric only (letter, number and underscore)";
+      this.msg = "name must be alphanumeric only (letter, number and underscore)";
       return;
+    }
+    if(this.hook.regexp == "") {
+      this.msg = "Regexp must not be empty";
+      return
     }
     if(this.project.hooks === undefined) {this.project.hooks = []}
     this.project.hooks.push(this.hook);

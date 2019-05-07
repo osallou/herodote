@@ -22,7 +22,7 @@ module.exports = {
               .then(() => {
                   conn.close()
                   resolve(true)
-              })
+              }).catch(err => { console.log('rabbitmq error', err); reject(true)})
     
         });
     }
