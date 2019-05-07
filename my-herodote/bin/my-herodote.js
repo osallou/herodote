@@ -15,6 +15,10 @@ const rl = readline.createInterface({
 
 function getToken() {
     return new Promise(function(resolve, reject) {
+        if(process.env.HERO_TOKEN !== undefined && process.env.HERO_TOKEN !== "") {
+            resolve(process.env.HERO_TOKEN)
+            return
+        }
         fs.readFile(homedir + '/.herodote', (err, token) => {  
             if (err) { reject(err); return;}
             resolve(token);
@@ -98,7 +102,7 @@ program
             }
             console.table(projects);
             process.exit(0);
-        })
+        }).catch(err => {console.error('Error:', err.message); process.exit(1)})
     }).catch(err => {
         console.error(err);
         process.exit(1);
@@ -145,7 +149,7 @@ program
                 process.exit(0);
             });
             //process.exit(0);
-        })
+        }).catch(err => {console.error('Error:', err.message); process.exit(1)})
     }).catch(err => {
         console.error(err);
         process.exit(1);
@@ -154,6 +158,52 @@ program
 
   program
   .command('jobs')
+  .option('--limit [value]', 'Limit number of results', 100)
+  .option('--as [value]', 'Run request as [user], admin only', null)
+  .option('--host [value]', 'Herodote server address https://xxx', 'https://herodote.genouest.org')
+  .action(function (args) {
+    let limit = 100;
+    try {
+        limit = parseInt(args.limit);
+    } catch (err) {
+        console.log('Invalid limit paramter, skipping...');
+    }
+    getToken().then((token) => {
+        let headers = {'Authorization': 'bearer ' + token};
+        if(args.as) {
+            headers['x-herodote-bind'] = args.as;
+        }
+        console.log('call ',args.host)
+        axios.get(args.host + '/jobs' + '?limit=' + limit, {headers: headers}).then(res => {
+            let jobsTable = [];
+            let jobs = res.data.jobs;
+            for(let i=0;i<jobs.length;i++){
+                let job = jobs[i];
+                jobsTable.push({
+                    id: job.id,
+                    user: job.user,
+                    project: job.projectId,
+                    file: job.file,
+                    hook: job.hook.name,
+                    start: dateConvert(job.start),
+                    begin: dateConvert(job.begin),
+                    end: dateConvert(job.end),
+                    status: getStatus(job.status)
+
+                })
+            }
+            console.table(jobsTable);
+
+            process.exit(0);
+        }).catch(err => {console.error('Something went wrong:', err.message); process.exit(1)})
+    }).catch(err => {
+        console.error(err);
+        process.exit(1);
+    }) 
+  });
+
+  program
+  .command('project-jobs')
   .arguments('<projectId>')
   .option('--limit [value]', 'Limit number of results', 100)
   .option('--as [value]', 'Run request as [user], admin only', null)
@@ -170,6 +220,7 @@ program
         if(args.as) {
             headers['x-herodote-bind'] = args.as;
         }
+        console.log('call ',args.host)
         axios.get(args.host + '/jobs/' + projectId + '?limit=' + limit, {headers: headers}).then(res => {
             let jobsTable = [];
             let jobs = res.data.jobs;
@@ -177,7 +228,8 @@ program
                 let job = jobs[i];
                 jobsTable.push({
                     id: job.id,
-                    project: projectId,
+                    user: job.user,
+                    project: job.projectId,
                     file: job.file,
                     hook: job.hook.name,
                     start: dateConvert(job.start),
@@ -190,7 +242,7 @@ program
             console.table(jobsTable);
 
             process.exit(0);
-        })
+        }).catch(err => {console.error('Something went wrong:', err.message); process.exit(1)})
     }).catch(err => {
         console.error(err);
         process.exit(1);
@@ -213,7 +265,7 @@ program
             let job = res.data.job;
             let jobInfo = {
                 id: job.id,
-                project: projectId,
+                project: job.projectId,
                 hook_name: job.hook.name,
                 hook_description: job.hook.description,
                 user: job.user,
@@ -226,12 +278,12 @@ program
                 begin: dateConvert(job.begin),
                 end: dateConvert(job.end),
                 status: getStatus(job.status),
-                exit_code: job.code
+                // exit_code: job.code
             }
             console.table(jobInfo);
 
             process.exit(0);
-        })
+        }).catch(err => {console.error('Error:', err.message); process.exit(1)})
     }).catch(err => {
         console.error(err);
         process.exit(1);
@@ -253,7 +305,7 @@ program
         axios.delete(args.host + '/jobs/' + projectId + '/' + jobId, {headers: headers}).then(res => {
             console.log('job tagged as killed');
             process.exit(0);
-        })
+        }).catch(err => {console.error('Error:', err.message); process.exit(1)})
     }).catch(err => {
         console.error(err);
         process.exit(1);
@@ -290,10 +342,12 @@ program
     }) 
   });
 
+console.log('You can override authentication TOKEN via the HERO_TOKEN environement variable')
+console.log('Job queries can be accessed via the ACL token, all other calls need an account and prior login call')
 program.parse(process.argv);
 
 var NO_COMMAND_SPECIFIED = program.args.length === 0;
 
 if (NO_COMMAND_SPECIFIED) {
-      program.help();
+      program.help()
 }
