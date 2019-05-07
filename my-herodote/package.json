@@ -1,6 +1,6 @@
 {
   "name": "@osallou/my-herodote",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "user cli tool to manage Herodote projects",
   "main": "index.js",
   "scripts": {
