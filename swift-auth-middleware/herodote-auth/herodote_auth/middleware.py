@@ -18,7 +18,8 @@ class Authorization(object):
         try:
             creds = jwt.decode(token, self.conf.get('secret'))
         except Exception as e:
-            logging.debug("decode error " + str(e))
+            logging.debug("not for herodote, failed to decode token" + str(e))
+            return self.app(environ, start_response)
         if creds is not None:
             creds['herodote_url'] = self.conf.get('herodote_url')
             if 'swift.authorize' not in environ:
