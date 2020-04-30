@@ -1,4 +1,4 @@
-FROM node:8-stretch
+FROM node:12-buster
 LABEL Author="Olivier Sallou <olivier.sallou@irisa.fr>"
 
 
