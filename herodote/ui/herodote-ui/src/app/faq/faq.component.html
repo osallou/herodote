@@ -114,6 +114,46 @@
     </div>
 </div>
 <div class="card">
+  <div class="card-header text-white bg-info mb-3" (click)="setCollapsed('gettingstarted')">Getting started</div>
+  <div class="card-body" [ngbCollapse]="isCollapsed('gettingstarted')">
+    <p>Now you should have a project, and maybe some hooks to trigger some jobs. What's next?</p>
+    <p>You, or users declared in ACLs can push data to the project. Example commands are shown in the project "How-to" section.</p>
+    <p>If some hooks were defined to trigger some jobs on file update, you should take care to push your files matching the regular expression defined in hook</p>
+    <p>For example, if a hook is defined the regexp ^data/.*$ (all files with path beginning with data/, the default), then files should be push with a path starting with data/</p>
+    <pre>
+      # Upload local file file_to_upload to data/file_to_upload
+      swift --os-auth-token "$TOKEN" --os-storage-url https://genostack-api-swift.genouest.org/v1/AUTH_xxxxx upload my_project file_to_upload --object-name data/file_to_upload
+      # Or using herodote-file (https://github.com/osallou/herodote-file/releases)
+      hero-file --os-auth-token "$TOKEN" --os-storage-url https://genostack-api-swift.genouest.org/v1/AUTH_xxxxx upload my_project file_to_upload --object-name data/file_to_upload
+    </pre>
+    <p><i>TOKEN</i> is the ACL generated for you or your friends in the ACLs section of your project</p>
+    <p>If using herodote-file to upload yuor files, tool will display the id of the executed jobs</p>
+    <p>Jobs will appear in herodote ui "Jobs" section. It is also possible to query herodote about job status via command-line using my-herodote (https://www.npmjs.com/package/@osallou/my-herodote)</p>
+    <p>To list jobs using my-herodote:</p>
+    <pre>
+      npm install -g my-herodote
+      # Run once
+      my-hero login my_user_id entifier my_project_name
+      # Or use your ACL token
+      export HERO_TOKEN=__my_token__
+      # Get last jobs
+      my-hero jobs
+    </pre>
+    <p>If you used the default hook template, when job is over, log file and archive result will be uploaded back to your project storage in result/__path_to_file__/__job_specific_identifier__/</p>
+    <p>Given previous example, If you uploaded data/myexperiments/myfile, results will be in:</p>
+    <ul>
+      <li> results/data/myexperiment/myfile/myproject.myhook.123456789/myproject.myhook.123456789.log</li>
+      <li> results/data/myexperiment/myfile/myproject.myhook.123456789/myproject.myhook.123456789.tar.gz</li>
+    </ul>
+    <p>You can list and download files using <i>swift client</i> or <i>herodote-file</i>:</p>
+    <pre>
+        hero-file --os-auth-token "$TOKEN" --os-storage-url https://genostack-api-swift.genouest.org/v1/AUTH_xxxxx list my_project
+        hero-file --os-auth-token "$TOKEN" --os-storage-url https://genostack-api-swift.genouest.org/v1/AUTH_xxxxx download my_project results/data/myexperiment/myfile/myproject.myhook.123456789/myproject.myhook.123456789.log
+    </pre>
+    <p>See <i>How-to</i> section of your project for command-line usage examples and tool help for more info.</p>
+  </div>
+</div>
+<div class="card">
     <div class="card-header text-white bg-info mb-3" (click)="setCollapsed('support')">Support</div>
     <div class="card-body" [ngbCollapse]="isCollapsed('support')">
       Still need some help ? Please contact the support at {{support}}

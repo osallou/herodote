@@ -39,6 +39,7 @@ export class ProjectComponent implements OnInit {
   activePanel: string = "project"
   meta: any = null
   stats: any = {pending: 0, running: 0, done: 0}
+  client: string = "swift"
 
   constructor(
     private route: ActivatedRoute,

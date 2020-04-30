@@ -173,7 +173,6 @@ program
         if(args.as) {
             headers['x-herodote-bind'] = args.as;
         }
-        console.log('call ',args.host)
         axios.get(args.host + '/jobs' + '?limit=' + limit, {headers: headers}).then(res => {
             let jobsTable = [];
             let jobs = res.data.jobs;

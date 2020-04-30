@@ -44,7 +44,7 @@
             <div class="form-group">
                 <div *ngIf="project.web">
                     <div><button (click)="updateWebStatus()" class="btn btn-lg btn-danger action">Disable public web access</button></div>
-                    <div>Public url: {{swift_url}}/v1/AUTH_{{project.ksProject}}/{{user.uid}}_{{project.name}}</div>
+                    <div>Public url: {{swift_url}}/v1/AUTH_{{project.ksProject}}/{{user.uid}}_{{project.name}}/</div>
                 </div>
                 <div *ngIf="!project.web">
                     <button (click)="updateWebStatus()" class="btn btn-lg btn-primary action">Enable public web access</button>
@@ -126,7 +126,7 @@
             <form *ngIf="selectedAcl">
                 <div class="form-group">
                     <label for="selectedAcl">{{selectedAcl.name}} token</label>
-                    <textarea rows="4" id="selectedAcl" type="text" class="form-control" placeholder="user token" disabled>{{selectedAcl.token}}</textarea>
+                    <textarea rows="4" id="selectedAcl" type="text" class="form-control" placeholder="user token" readOnly>{{selectedAcl.token}}</textarea>
                 </div>
             </form>        
             <form class="form-group">
@@ -145,8 +145,12 @@
             </div>
         </div>
         <div *ngIf="isActive('howto')">
+            <select class="form-control" [ngModelOptions]="{standalone: true}" [(ngModel)]="client">
+                <option value="swift">Python swift client</option>
+                <option value="hero">Herodote-file client</option>
+            </select>
             <div class="row">
-                <div class="col-sm-12">
+                <div *ngIf="client == 'swift'" class="col-sm-12">
                   <div class="card">
                     <div class="card-header">Setup</div>
                     <div class="card-body">
@@ -154,9 +158,19 @@
                     </div>
                   </div>
                 </div>
+                <div *ngIf="client == 'hero'" class="col-sm-12">
+                        <div class="card">
+                          <div class="card-header">Setup</div>
+                          <div class="card-body">
+                            <code>Download hero-file latest release for your system from https://github.com/osallou/herodote-file/releases</code>
+                            <br/><code>wget -O hero-file https://github.com/osallou/herodote-file/releases/download/0.5.0/hero-file.linux.amd64</code>
+                            <br/><code>chmod +x hero-file</code>
+                          </div>
+                        </div>
+                      </div>
             </div>
             <div class="row">
-                <div class="col-sm-12">
+                <div *ngIf="client == 'swift'" class="col-sm-12">
                   <div class="card">
                     <div class="card-header">List</div>
                     <div class="card-body">
@@ -165,21 +179,44 @@
                       <code>swift --os-auth-token "$TOKEN" --os-storage-url {{swift_url}}/v1/AUTH_{{project.ksProject}}  list {{user.uid}}_{{project.name}}</code>
                     </div>
                   </div>
-                </div>    
-                <div class="col-sm-12">
+                </div>
+                <div *ngIf="client == 'hero'" class="col-sm-12">
+                        <div class="card">
+                          <div class="card-header">List</div>
+                          <div class="card-body">
+                            <code>export TOKEN=your_token_id</code>
+                            <br/>
+                            <code>hero-file --os-auth-token "$TOKEN" --os-storage-url {{swift_url}}/v1/AUTH_{{project.ksProject}}  list {{user.uid}}_{{project.name}}</code>
+                          </div>
+                        </div>
+                      </div>   
+                <div *ngIf="client == 'swift'" class="col-sm-12">
                   <div class="card">
                     <div class="card-header">Upload</div>
                     <div class="card-body">
                         <code>export TOKEN=your_token_id</code>
                         <p>To push some data to this project, upload them to the data directory:</p>
                         <p>If file > 1G</p>
-                        <code>swift --os-auth-token "$TOKEN" --os-storage-url {{swift_url}}/v1/AUTH_{{project.ksProject}} upload {{user.uid}}_{{project.name}} -S 1073741824 large_file_to_upload --object-name data/large_file_to_upload</code>
+                        <code>swift --os-auth-token "$TOKEN" --os-storage-url {{swift_url}}/v1/AUTH_{{project.ksProject}} upload {{user.uid}}_{{project.name}} --segment-size 1073741824 large_file_to_upload --object-name data/large_file_to_upload</code>
                         <p>else</p>
                         <code>swift --os-auth-token "$TOKEN" --os-storage-url {{swift_url}}/v1/AUTH_{{project.ksProject}} upload {{user.uid}}_{{project.name}} file_to_upload --object-name data/file_to_upload</code>
                     </div>
                   </div>
                 </div>
-                <div class="col-sm-12">
+                <div *ngIf="client == 'hero'" class="col-sm-12">
+                        <div class="card">
+                          <div class="card-header">Upload</div>
+                          <div class="card-body">
+                              <code>export TOKEN=your_token_id</code>
+                              <p>To push some data to this project, upload them to the data directory:</p>
+                              <p>If file > 1G</p>
+                              <code>hero-file --os-auth-token "$TOKEN" --os-storage-url {{swift_url}}/v1/AUTH_{{project.ksProject}} --segment-size 1073741824 upload {{user.uid}}_{{project.name}} large_file_to_upload --object-name data/large_file_to_upload</code>
+                              <p>else</p>
+                              <code>hero-file --os-auth-token "$TOKEN" --os-storage-url {{swift_url}}/v1/AUTH_{{project.ksProject}} upload {{user.uid}}_{{project.name}} file_to_upload --object-name data/file_to_upload</code>
+                          </div>
+                        </div>
+                </div>
+                <div *ngIf="client == 'swift'" class="col-sm-12">
                   <div class="card">
                     <div class="card-header">Download</div>
                     <div class="card-body">
@@ -189,20 +226,44 @@
                     </div>
                   </div>
                 </div>
-                <div class="col-sm-12">
+                <div *ngIf="client == 'hero'" class="col-sm-12">
+                        <div class="card">
+                          <div class="card-header">Download</div>
+                          <div class="card-body">
+                              <code>export TOKEN=your_token_id</code>
+                              <br/>
+                              <code>hero-file --os-auth-token "$TOKEN" --os-storage-url {{swift_url}}/v1/AUTH_{{project.ksProject}} download {{user.uid}}_{{project.name}} file_to_download</code>
+                          </div>
+                        </div>
+                      </div>
+                <div *ngIf="client == 'swift'" class="col-sm-12">
                         <div class="card">
                           <div class="card-header">Delete</div>
                           <div class="card-body">
                               <code>export TOKEN=your_token_id</code>
                               <br/>
                               <code>swift --os-auth-token "$TOKEN" --os-storage-url {{swift_url}}/v1/AUTH_{{project.ksProject}} delete {{user.uid}}_{{project.name}} file_to_delete</code>
-                              <p>To delete all files</p>
+                              <br/><p>To delete all files</p>
                               <code>swift  --os-auth-token "$TOKEN" --os-storage-url {{swift_url}}/v1/AUTH_{{project.ksProject}} list {{user.uid}}_{{project.name}} > list.lst</code>
                               <br/>
                               <code>cat list.lst | xargs swift --os-auth-token "$TOKEN" --os-storage-url {{swift_url}}/v1/AUTH_{{project.ksProject}} delete {{user.uid}}_{{project.name}} {{ '{' }}{{ '}' }}</code>
                           </div>
                         </div>
-                      </div>  
+                </div>
+                <div *ngIf="client == 'hero'" class="col-sm-12">
+                        <div class="card">
+                          <div class="card-header">Delete</div>
+                          <div class="card-body">
+                              <code>export TOKEN=your_token_id</code>
+                              <br/>
+                              <code>hero-file --os-auth-token "$TOKEN" --os-storage-url {{swift_url}}/v1/AUTH_{{project.ksProject}} delete {{user.uid}}_{{project.name}} file_to_delete</code>
+                              <br/><p>To delete all files under data/</p>
+                              <code>hero-file  --os-auth-token "$TOKEN" --os-storage-url {{swift_url}}/v1/AUTH_{{project.ksProject}} --prefix data delete {{user.uid}}_{{project.name}}</code>
+                              <br/><p>To delete all files in project</p>
+                              <code>hero-file  --os-auth-token "$TOKEN" --os-storage-url {{swift_url}}/v1/AUTH_{{project.ksProject}} --prefix "**/*" delete {{user.uid}}_{{project.name}}</code>
+                          </div>
+                        </div>
+                </div>
             </div>
         </div>
 
