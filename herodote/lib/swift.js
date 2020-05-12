@@ -55,7 +55,6 @@ module.exports = {
     },
 
     setMetaPrimary: (meta, project, bucket, ksToken) => {
-        console.log('????')
         return new Promise(function (resolve, reject){
             console.log('set meta primary', meta)
             let swift_url = CONFIG.openstack.swift.url + "/v1/AUTH_" + project + "/" + bucket;
@@ -65,7 +64,19 @@ module.exports = {
                 headers: headers
             }).then(
                 resp => {
-                    resolve({bucket: resp.headers})
+                    let swift_url = CONFIG.openstack.swift.url + "/v1/AUTH_" + project + "/" + bucket + '_segments';
+                    let headers = meta;
+                    headers["X-Auth-Token"] = ksToken;
+                    axios.post(swift_url, {}, {
+                        headers: headers
+                    }).then(
+                        segresp => {
+                            resolve({bucket: resp.headers})
+                        }
+                    ).catch(err => {
+                        logger.error('swift primary meta failure for ' + bucket + ':' + err)
+                        reject('failed to set bucket primary meta ' + bucket);
+                    })
                 }
             ).catch(err => {
                 logger.error('swift primary meta failure for ' + bucket + ':' + err)
