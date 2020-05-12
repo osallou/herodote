@@ -57,13 +57,17 @@ class Authorization(object):
             resp = start_response(stat_str, headers)
             return resp
         obj = None
+        container = None
         try:
             (version, account, container, obj) = \
                 split_path(environ['PATH_INFO'], 4, 4, True)
         except ValueError:
             # not an object request
             pass
-        if environ['REQUEST_METHOD'] == 'PUT' and obj:
+        isSegment = False
+        if container and container.endswith('_segments'):
+            isSegment = True
+        if isSegment is False and environ['REQUEST_METHOD'] == 'PUT' and obj:
             return self.app(environ, herodote_response)
 
         return self.app(environ, start_response)
