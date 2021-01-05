@@ -17,7 +17,7 @@ class Authorization(object):
         token = environ.get('HTTP_X_AUTH_TOKEN', environ.get('HTTP_X_STORAGE_TOKEN'))
         creds = None
         try:
-            creds = jwt.decode(token, self.conf.get('secret'))
+            creds = jwt.decode(token, self.conf.get('secret'), algorithms=['HS256'])
         except Exception as e:
             self.logger.debug("not for herodote, failed to decode token" + str(e))
             return self.app(environ, start_response)
