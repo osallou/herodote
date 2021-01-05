@@ -2,8 +2,7 @@
 
 Swift auth middleware for herodote
 
-
-Python 2 support only as Openstack Swift does not support Python3 yet.
+To be tested on python3 (swift was python2 only)
 
 # Install
 
