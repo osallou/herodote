@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/osallou/herodote#readme",
   "dependencies": {
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "commander": "^2.19.0",
     "promise": "^8.0.2"
   }
