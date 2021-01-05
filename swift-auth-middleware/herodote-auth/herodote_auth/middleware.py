@@ -2,7 +2,7 @@ from swift.common.swob import HTTPForbidden, HTTPUnauthorized, HTTPNotFound
 import logging
 import json
 import jwt
-from swift.common.utils import split_path
+from swift.common.utils import split_path, get_logger
 import requests
 import urllib
 
@@ -11,6 +11,7 @@ class Authorization(object):
     def __init__(self, app, conf):
         self.app = app
         self.conf = conf
+        self.logger = get_logger(conf, log_route='herodote_auth')
 
     def __call__(self, environ, start_response):
         token = environ.get('HTTP_X_AUTH_TOKEN', environ.get('HTTP_X_STORAGE_TOKEN'))
@@ -18,7 +19,7 @@ class Authorization(object):
         try:
             creds = jwt.decode(token, self.conf.get('secret'))
         except Exception as e:
-            logging.debug("not for herodote, failed to decode token" + str(e))
+            self.logger.debug("not for herodote, failed to decode token" + str(e))
             return self.app(environ, start_response)
         if creds is not None:
             creds['herodote_url'] = self.conf.get('herodote_url')
@@ -88,7 +89,7 @@ class Authorization(object):
         if account != creds['account']:
             return HTTPUnauthorized(request=req)
         else:
-            uc = urllib.unquote(container)
+            uc = urllib.parse.unquote(container)
             if uc!=creds['container'] and uc!=creds['container']+'_segments':
                 return HTTPUnauthorized(request=req)
         try:

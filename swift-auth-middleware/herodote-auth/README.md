@@ -1,8 +1,7 @@
 # About
 
-Swift auth middleware for herodote
+Swift auth middleware for herodote (python3 only)
 
-To be tested on python3 (swift was python2 only)
 
 # Install
 
