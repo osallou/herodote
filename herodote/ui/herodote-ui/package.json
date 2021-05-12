@@ -23,7 +23,7 @@
     "@nomadreservations/ngx-codemirror": "^2.0.0",
     "@types/jquery": "^3.3.29",
     "bootstrap": "^4.3.1",
-    "codemirror": "^5.42.2",
+    "codemirror": "^5.58.2",
     "core-js": "^2.5.4",
     "jquery": "^3.3.1",
     "popper.js": "^1.14.6",
